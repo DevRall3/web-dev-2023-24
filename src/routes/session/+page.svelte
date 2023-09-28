@@ -64,7 +64,7 @@
 
 <style>
     .banner {
-        background: url("./session-banner.jpg");
+        background: url("session-banner.jpg");
         background-size: cover;
         background-position: center;
 
