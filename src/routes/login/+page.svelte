@@ -36,7 +36,7 @@
         align-items: center;
         height: 100vh;
         
-        background: url('./login-banner.jpg');
+        background: url('/static/login-banner.jpg');
         background-position: center;
         background-size: cover;
     }

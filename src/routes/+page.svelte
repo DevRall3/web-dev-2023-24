@@ -40,7 +40,7 @@
 
 <style>
     .home-banner {
-        background: url('./home-banner.jpg');
+        background: url('/static/home-banner.jpg');
         background-size: cover;
         background-position: center;
 
