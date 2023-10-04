@@ -1,13 +1,24 @@
-import { fail } from '@sveltejs/kit';
-import type { Actions, PageServerLoad } from './$types';
+import { PrismaClient } from '@prisma/client';
+import { fail, type Actions } from '@sveltejs/kit';
 
-export let _sessions: Map<string, { messages: { text: string; user: string }[]; createdBy: string }> = new Map();
+const prisma = new PrismaClient();
 
+export const load = async () => {
+    try {
+        const sessions = await prisma.session.findMany({
+            include: {
+                messages: true,
+            },
+        });
 
-export const load = (async ({ request, params }) => {
-
-    return { sessions: _sessions };
-}) satisfies PageServerLoad;
+        return {
+            sessions,
+        };
+    } catch (error) {
+        // Handle errors appropriately, e.g., log the error or return an error object
+        throw error;
+    }
+};
 
 export const actions: Actions = {
     create: async ({ request, cookies }) => {
@@ -17,14 +28,18 @@ export const actions: Actions = {
 
         if (!sessionName) {
             return fail(400, { sessionName: "no name?" });
-        } else if (_sessions.has(sessionName)) {
-            return fail(400, { sessionName: "Session already exists." });
         }
 
-        // Create a session with user information
-        _sessions.set(sessionName, {
-            messages: [],
-            createdBy: user || "unknown", // Default to "unknown" if user is not set
-        });
-    }
+        // Create a session in the database
+        try {
+            await prisma.session.create({
+                data: {
+                    name: sessionName,
+                    createdBy: user || "unknown",
+                },
+            });
+        } catch (error) {
+            return fail(500, { sessionName: "Error creating session" });
+        }
+    },
 };

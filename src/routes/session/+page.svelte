@@ -40,16 +40,14 @@
             <span />
         </div>
 
-        {#each data.sessions as [sessionName, sessionInfo]}
-            <div class="activeSessions">
-                <a href="/session/{sessionName}">
-                    {sessionName} - {sessionInfo.messages.length} messages -
-                    <span class="created-by"
-                        >Created by: {sessionInfo.createdBy}</span
-                    >
-                </a>
-            </div>
-        {/each}
+        {#each data.sessions as session}
+        <div class="session-details">
+            <a href="/session/{session.name}">{session.name}</a>
+            <p>Created by: {session.createdBy}</p>
+            <p>Number of Messages: {session.messages.length}</p>
+            <!-- Add any additional information you want to display -->
+        </div>
+    {/each}
     </section>
     <footer>
         <h3>Made by Rasmus</h3>
@@ -64,7 +62,7 @@
 
 <style>
     .banner {
-        background: url("/static/session-banner.jpg");
+        background: url("./session-banner.jpg");
         background-size: cover;
         background-position: center;
 

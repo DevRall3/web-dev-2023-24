@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgres"
   url      = env("DATABASE_URL")
 }
 
@@ -15,5 +15,21 @@ model user {
   name  String  @unique
   password String
 }
+
+model Session {
+  id       Int      @id @default(autoincrement())
+  name     String   @unique
+  createdBy String
+  messages Message[]
+}
+
+model Message {
+  id         Int      @id @default(autoincrement())
+  text       String
+  user       String
+  sessionId  Int
+  session    Session  @relation(fields: [sessionId], references: [id])
+}
+
 
 

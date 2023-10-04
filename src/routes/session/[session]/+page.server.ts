@@ -1,24 +1,39 @@
 import type { PageServerLoad } from './$types';
-import { _sessions } from '../+page.server';
-import { error, type Actions } from '@sveltejs/kit';
+import { error, type Actions, HttpError_1, fail } from '@sveltejs/kit';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 let currentSession : string
 let messages : {text: string, user: string}[]
 
-export const load = (async ({ request,params, cookies }) => {
-
+export const load = async ({ params, cookies }) => {
     currentSession = params.session;
+    let user = cookies.get("username");
 
-    let user = cookies.get("username")
 
-    if(!_sessions.has(currentSession)){
-        throw error(404, "Session not found")
+    try {
+        const session = await prisma.session.findUnique({
+            where: {
+                name: currentSession,
+            },
+            include: {
+                messages: true,
+            },
+        });
+
+        if (!session) {
+            throw error(404, "Session not found");
+        }
+
+        messages = session.messages;
+    } catch (error : any) {
+        throw error(404, "Session not found");
     }
-    messages = (_sessions.has(currentSession) ? _sessions.get(currentSession)! : { messages: [], createdBy: "" }).messages;
 
+    return { session: currentSession, messages, user };
+};
 
-    return {session: currentSession, messages, user};
-}) satisfies PageServerLoad;
 
 export const actions: Actions = {
     message: async ({ request, cookies }) => {
@@ -34,11 +49,33 @@ export const actions: Actions = {
             user = "unknown";
         }
 
-        const session = _sessions.get(currentSession);
+        try {
+            // Find the session by name
+            const session = await prisma.session.findUnique({
+                where: {
+                    name: currentSession,
+                },
+            });
 
-        if (session) {
-            // Check if the session is defined before using push
-            session.messages.push({ text: msg, user: user });
+            if (session) {
+                // Create a message and associate it with the session
+                await prisma.message.create({
+                    data: {
+                        text: msg,
+                        user: user,
+                        session: {
+                            connect: {
+                                id: session.id,
+                            },
+                        },
+                    },
+                });
+            } else {
+                return fail(404, { message: "Session not found" });
+            }
+        } catch (error) {
+            return fail(500, { message: "Error sending message" });
         }
     }
 };
+

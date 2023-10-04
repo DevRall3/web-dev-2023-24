@@ -63,7 +63,7 @@
         justify-content: center;
         align-items: center;
         
-        background: url('/static/chat-bg-1.jpg');
+        background: url('../../chat-bg-1.jpg');
         background-position: center;
         background-size: cover;
 
