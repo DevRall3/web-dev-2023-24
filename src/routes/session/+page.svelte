@@ -36,18 +36,17 @@
 
         <h3>Active Session</h3>
 
-        <div class="black-devider">
-            <span />
+        <div class="active-sessions">
+            {#each data.sessions as session}
+            <div class="session-details">
+                <a href="/session/{session.name}">{session.name}</a>
+                <hr>
+                <p>Created by: {session.createdBy}</p>
+                <p>Number of Messages: {session.messages.length}</p>
+                <!-- Add any additional information you want to display -->
+            </div>
+                {/each}
         </div>
-
-        {#each data.sessions as session}
-        <div class="session-details">
-            <a href="/session/{session.name}">{session.name}</a>
-            <p>Created by: {session.createdBy}</p>
-            <p>Number of Messages: {session.messages.length}</p>
-            <!-- Add any additional information you want to display -->
-        </div>
-    {/each}
     </section>
     <footer>
         <h3>Made by Rasmus</h3>
@@ -133,6 +132,39 @@
         color: black;
     }
 
+    .active-sessions {
+        display: flex;
+        flex-wrap: wrap;
+
+        width: 80vw;
+    }
+
+    .session-details {
+        margin: 10px 10px;
+        background-color: black;
+        border: 5px solid white;
+        color: white;
+        box-shadow: 2px 3px 10px 4px rgba(0, 0, 0, 0.5);
+        border-radius: 15px;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        width: 150px;
+    }
+
+    .session a {
+        margin-top: 5px;
+        color: white;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+
+    .session hr {
+        margin: 5px 0;
+    }
+    
     form {
         margin-top: 1rem;
     }
@@ -171,7 +203,8 @@
     }
 
     .session h3 {
-        margin-bottom: 0.2rem;
+        margin-bottom: 0.4rem;
+        font-size: 28px;
     }
 
     .activeSessions {
