@@ -38,13 +38,15 @@
 
         <div class="active-sessions">
             {#each data.sessions as session}
-            <div class="session-details">
+            <form class="session-details" action="?/deleteSession" method="post" use:enhance>
                 <a href="/session/{session.name}">{session.name}</a>
                 <hr>
                 <p>Created by: {session.createdBy}</p>
                 <p>Number of Messages: {session.messages.length}</p>
+                <input type="text" name="id" value={session.id} hidden>
+                <input type="submit" value="Delete">
                 <!-- Add any additional information you want to display -->
-            </div>
+            </form>
                 {/each}
         </div>
     </section>

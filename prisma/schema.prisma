@@ -13,8 +13,8 @@ datasource db {
 model user {
   id       Int       @id @default(autoincrement())
   name     String    @unique
-  salt     String
-  hash String
+  password String
+
 }
 
 model Session {
@@ -29,7 +29,7 @@ model Message {
   text       String
   user       String
   sessionId  Int
-  session    Session  @relation(fields: [sessionId], references: [id])
+  session    Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 }
 
 

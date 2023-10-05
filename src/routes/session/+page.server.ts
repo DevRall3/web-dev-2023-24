@@ -42,4 +42,47 @@ export const actions: Actions = {
             return fail(500, { sessionName: "Error creating session" });
         }
     },
+
+    deleteSession: async ({ request, cookies }) => {
+        let data = await request.formData();
+        let sessionId = parseInt(data.get("id")!.toString(), 10);
+        const user = cookies.get("username"); // Get the username from cookies
+        console.log("Hello", sessionId)
+        // Check if the user is authenticated
+        if (!user) {
+            console.log("Unauthorized")
+            return fail(401, { message: "Unauthorized" });
+        }
+
+        // Check if the user is the creator of the session
+        const session = await prisma.session.findUnique({
+            where: { id: sessionId },
+        });
+
+        if (!session) {
+            console.log("Session not found")
+            return fail(404, { message: "Session not found" });
+        }
+
+        if (session.createdBy !== user) {
+            console.log("Forbidden: You are not the creator of this session")
+            return fail(403, { message: "Forbidden: You are not the creator of this session" });
+        }
+
+        // If the user is authorized, delete the session
+        try {
+            await prisma.session.delete({
+                where: { id: sessionId },
+            });
+
+            return {
+                status: 200,
+                body: { message: "Session deleted successfully" },
+            };
+        } catch (error) {
+            console.log("Error deleting session")
+            console.log(error)
+            return fail(500, { message: "Error deleting session" });
+        }
+    },
 };
